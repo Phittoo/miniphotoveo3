@@ -687,14 +687,6 @@ const generateNewVideo = async (
 
 // ---
 
-const assetUrls: TldrawProps['assetUrls'] = {
-  icons: {
-    'genai-describe-image': await loadIcon('/genai-describe-image.svg'),
-    'genai-generate-image': await loadIcon('/genai-generate-image.svg'),
-    'genai-generate-video': await loadIcon('/genai-generate-video.svg'),
-  },
-};
-
 const OverlayComponent = track(() => {
   const editor = useEditor();
   const {addToast} = useToasts();
@@ -898,6 +890,9 @@ const ContextualToolbarComponent = track(() => {
 export default function App() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [showGettingStarted, setShowGettingStarted] = useState(false);
+  const [assetUrls, setAssetUrls] = useState<TldrawProps['assetUrls'] | null>(
+    null,
+  );
 
   useEffect(() => {
     // A more specific key to avoid conflicts with other starter apps
@@ -905,12 +900,29 @@ export default function App() {
     if (!hasVisited) {
       setShowGettingStarted(true);
     }
+
+    async function loadAssets() {
+      const loadedAssetUrls: TldrawProps['assetUrls'] = {
+        icons: {
+          'genai-describe-image': await loadIcon('/genai-describe-image.svg'),
+          'genai-generate-image': await loadIcon('/genai-generate-image.svg'),
+          'genai-generate-video': await loadIcon('/genai-generate-video.svg'),
+        },
+      };
+      setAssetUrls(loadedAssetUrls);
+    }
+
+    loadAssets();
   }, []);
 
   const handleCloseGettingStarted = () => {
     localStorage.setItem('hasVisitedGenAICanvas', 'true');
     setShowGettingStarted(false);
   };
+
+  if (!assetUrls) {
+    return <div className="loading-screen">Loading...</div>;
+  }
 
   return (
     <>
